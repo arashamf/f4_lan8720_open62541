@@ -3,11 +3,10 @@
     "tasks": 
     [
         {
-            "label": "build",
+            "label": "build example_app",
             "type": "shell",
-            "command": "make",
             "options": {
-                "cwd": "${workspaceRoot}"
+                "cwd": "${workspaceRoot}/build"
             },
             "args": [
                 "-j9"
@@ -16,8 +15,10 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "problemMatcher": "$gcc",
+            "command": "make"
         },
+
         {
             "label": "write_mk",
             "type": "shell",
@@ -27,6 +28,7 @@
             ],
             "problemMatcher": []
         },
+
         {
             "label": "clean",
             "type": "shell",

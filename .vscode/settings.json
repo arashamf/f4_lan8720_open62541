@@ -34,6 +34,17 @@
         "task.h": "c",
         "gpio.h": "c",
         "ethernetif.h": "c",
-        "lwip.h": "c"
+        "lwip.h": "c",
+        "tcpip.h": "c",
+        "freertos.h": "c",
+        "portable.h": "c",
+        "semphr.h": "c",
+        "cmsis_os.h": "c",
+        "usart.h": "c",
+        "complex": "c",
+        "format": "c",
+        "socket.h": "c",
+        "sockets.h": "c",
+        "net.h": "c"
     }
 }

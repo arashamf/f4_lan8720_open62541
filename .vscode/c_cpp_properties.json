@@ -1,13 +1,19 @@
 {  
     "env": {
         "LWIPIncPath": [
-            "${workspaceFolder}/lwip/**"   
+            "${workspaceFolder}/src/include/lwip",
+            "${workspaceFolder}/lwip/**"
         ],
         "FREERTOSIncPath": [
-            "${workspaceFolder}/FreeRTOS/Source/**" 
+            "${workspaceFolder}/FreeRTOS/Source/include",
+            "${workspaceFolder}/FreeRTOS",
+            "${workspaceFolder}/FreeRTOS/Source/portable/GCC/ARM_CM4F" 
         ],
         "CoreIncPath": [
             "${workspaceFolder}/Core/Inc"
+        ],
+        "Open62541Path": [
+            "${workspaceFolder}/open62541"
         ]
     },
 
@@ -19,6 +25,7 @@
                 "${FREERTOSIncPath}",
                 "${LWIPIncPath}",
                 "${CoreIncPath}",
+                "${Open62541Path}",
                 "${workspaceRoot}/**"
             ],
             "cStandard": "c11",
@@ -32,7 +39,8 @@
                 "USE_HAL_DRIVER",
                 "USE_FULL_LL_DRIVER",
                 "_RTE_",
-                "DEBUG_MODE" ,
+                "DEBUG_MODE",
+                //"USE_CMSIS_RTOS",
                 "USE_FULL_ASSERT"
             ]
         }

@@ -27,7 +27,15 @@
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
 #include <string.h>
-#include "cmsis_os.h"
+
+#ifdef USE_CMSIS_RTOS
+ #include "cmsis_os.h"
+#else
+#include "semphr.h"
+#include "task.h"
+#include "FreeRTOS.h"
+#endif
+
 #include "lwip/tcpip.h"
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
@@ -73,7 +81,11 @@ __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethe
 /* USER CODE END 2 */
 
 /* Semaphore to signal incoming packets */
+#ifdef USE_CMSIS_RTOS
 osSemaphoreId s_xSemaphore = NULL;
+#else
+SemaphoreHandle_t s_xSemaphore = NULL;
+#endif
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 
@@ -181,7 +193,12 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* ethHandle)
   */
 void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
 {
+  #ifdef USE_CMSIS_RTOS
   osSemaphoreRelease(s_xSemaphore);
+  #else
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  xSemaphoreGiveFromISR( s_xSemaphore, &xHigherPriorityTaskWoken );
+  #endif
 }
 
 /* USER CODE BEGIN 4 */
@@ -205,7 +222,7 @@ static void low_level_init(struct netif *netif)
   
 /* Init ETH */
 
-   uint8_t MACAddr[6] ;
+  uint8_t MACAddr[6] ;
   heth.Instance = ETH;
   heth.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
   heth.Init.PhyAddress = LAN8742A_PHY_ADDRESS;
@@ -262,12 +279,21 @@ static void low_level_init(struct netif *netif)
   #endif /* LWIP_ARP */
   
 /* create a binary semaphore used for informing ethernetif of frame reception */
+  #ifdef USE_CMSIS_RTOS
   osSemaphoreDef(SEM);
   s_xSemaphore = osSemaphoreCreate(osSemaphore(SEM), 1);
-
+  #else
+  vSemaphoreCreateBinary(s_xSemaphore);
+  #endif
+  
 /* create the task that handles the ETH_MAC */
+  #ifdef USE_CMSIS_RTOS
   osThreadDef(EthIf, ethernetif_input, osPriorityRealtime, 0, INTERFACE_THREAD_STACK_SIZE);
   osThreadCreate (osThread(EthIf), netif);
+  #else
+  TaskHandle_t os_thread_def_EthIf = NULL;
+  xTaskCreate((TaskFunction_t )ethernetif_input, (const char*)"EthIf", INTERFACE_THREAD_STACK_SIZE, netif, osPriorityRealtime, (TaskHandle_t*)&os_thread_def_EthIf);
+  #endif
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
 
@@ -494,7 +520,12 @@ void ethernetif_input(void const * argument)
   
   for( ;; )
   {
+    #ifdef USE_CMSIS_RTOS
     if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+    #else
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    if (xSemaphoreTakeFromISR (s_xSemaphore, &xHigherPriorityTaskWoken) == pdTRUE )
+    #endif
     {
       do
       {   

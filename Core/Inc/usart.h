@@ -42,6 +42,7 @@ void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 #ifdef DEBUG_MODE 
+void DBG_USART_Init(void);
 void dbg_putStr (const char *);
 extern char dbg_buf[];
 extern uint32_t dbg_buf_size;

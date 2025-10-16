@@ -31,27 +31,30 @@ OPT = -Og
 BUILD_DIR = build
 
 ROOT_DIR     = .
-APP_PATH 			= 	$(ROOT_DIR)/Core
-APP_PATH_SRC 		= 	$(APP_PATH)/Src
-APP_PATH_INC 		= 	$(APP_PATH)/Inc
+CORE_PATH 			= 	$(ROOT_DIR)/Core
+CORE_PATH_SRC 		= 	$(CORE_PATH)/Src
+CORE_PATH_INC 		= 	$(CORE_PATH)/Inc
+APP_PATH 			= 	$(ROOT_DIR)/app
 ######################################
 # source
 ######################################
 # C sources
 C_SOURCES =  \
-$(APP_PATH_SRC)/gpio.c \
-$(APP_PATH_SRC)/main.c \
-$(APP_PATH_SRC)/stm32f4xx_hal_msp.c \
-$(APP_PATH_SRC)/stm32f4xx_hal_timebase_tim.c \
-$(APP_PATH_SRC)/stm32f4xx_it.c \
-$(APP_PATH_SRC)/syscalls.c \
-$(APP_PATH_SRC)/sysmem.c \
-$(APP_PATH_SRC)/system_stm32f4xx.c \
-$(APP_PATH_SRC)/usart.c 
+$(APP_PATH)/main.c \
+$(APP_PATH)/net.c \
+$(CORE_PATH_SRC)/gpio.c \
+$(CORE_PATH_SRC)/stm32f4xx_hal_msp.c \
+$(CORE_PATH_SRC)/stm32f4xx_hal_timebase_tim.c \
+$(CORE_PATH_SRC)/stm32f4xx_it.c \
+$(CORE_PATH_SRC)/syscalls.c \
+$(CORE_PATH_SRC)/sysmem.c \
+$(CORE_PATH_SRC)/system_stm32f4xx.c \
+$(CORE_PATH_SRC)/usart.c 
 
 # C includes
 C_INCLUDES =  	$(ROOT_DIR)
-C_INCLUDES += 	$(APP_PATH_INC)
+C_INCLUDES += 	$(CORE_PATH_INC)
+C_INCLUDES += 	$(APP_PATH)
 
 # ASM sources
 ASM_SOURCES =  \
@@ -62,8 +65,9 @@ ASMM_SOURCES =
 
 # include sub makefiles
 include	filelists_lwip.mk
-include	fillelists_freertos.mk
 include filelists_stdlib.mk
+include	fillelists_freertos.mk
+#include	fillelists_open62541.mk
 
 INC_DIR  = $(patsubst %, -I%, $(C_INCLUDES))
 
@@ -108,9 +112,14 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
--DUSE_FULL_LL_DRIVER \
--DUSE_HAL_DRIVER \
--DSTM32F407xx
+-D USE_FULL_LL_DRIVER \
+-D USE_HAL_DRIVER \
+-D STM32F407xx
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -gdwarf-2
+CFLAGS += -D DEBUG_MODE
+endif
 
 # AS includes
 AS_INCLUDES =  
@@ -120,11 +129,6 @@ ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffuncti
 
 #CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 CFLAGS += $(MCU) $(C_DEFS) $(OPT) -Wall -fdata-sections -ffunction-sections
-
-ifeq ($(DEBUG), 1)
-CFLAGS += -g -gdwarf-2
-endif
-
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
