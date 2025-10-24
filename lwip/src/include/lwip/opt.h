@@ -1949,7 +1949,7 @@
  * (only used if you use sockets.c)
  */
 #if !defined LWIP_COMPAT_SOCKETS || defined __DOXYGEN__
-#define LWIP_COMPAT_SOCKETS             1
+#define LWIP_COMPAT_SOCKETS             0
 #endif
 
 /**
@@ -2037,7 +2037,7 @@
  * SO_REUSE==1: Enable SO_REUSEADDR option.
  */
 #if !defined SO_REUSE || defined __DOXYGEN__
-#define SO_REUSE                        0
+#define SO_REUSE                        1
 #endif
 
 /**

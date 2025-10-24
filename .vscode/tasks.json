@@ -6,7 +6,7 @@
             "label": "build example_app",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceRoot}/build"
+                "cwd": "${workspaceRoot}"
             },
             "args": [
                 "-j9"

@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+//include "cmsis_os.h"
 #include "lwip.h"
 #include "usart.h"
 #include "gpio.h"
@@ -28,6 +28,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "net.h"
+#include "task.h"
+#include "opcua.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +54,8 @@ extern leds_t leds[];
 uint8_t handle_led =  green;
 TaskHandle_t LEDtask_Handler=NULL;
 TaskHandle_t TCPtask_Handler=NULL;
+TaskHandle_t OPCUAtask_Handler=NULL;
+
 #ifdef DEBUG_MODE 
 extern uint32_t dbg_buf_size;
 extern char dbg_buf[];
@@ -99,19 +103,32 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
- // MX_USART1_UART_Init();
   DBG_USART_Init();
   MX_LWIP_Init();
   /* USER CODE BEGIN 2 */
-  xTaskCreate((TaskFunction_t )led_task, (const char*)"led_task", 128, (void* )NULL, (UBaseType_t)3,	(TaskHandle_t*)&LEDtask_Handler);
-  xTaskCreate((TaskFunction_t )tcp_thread, (const char*)"tcp_thread", 128, (void* )NULL, (UBaseType_t)3,	(TaskHandle_t*)&TCPtask_Handler);
-  #ifdef DEBUG_MODE 
-  dbg_putStr ("dbg_mode\r\n");
+
+  #if defined OPEN62541_FEERTOS_USE_OWN_MEM && DEBUG_MODE
+  sprintf (dbg_buf, "Start; free_heap=%u\r\n", xPortGetMinimumEverFreeHeapSize());
+  dbg_putStr (dbg_buf);
+  #endif
+  
+  xTaskCreate((TaskFunction_t )led_task, (const char*)"led_task", 64, (void* )NULL, (UBaseType_t)1,	(TaskHandle_t*)&LEDtask_Handler);
+ 
+  #if defined OPEN62541_FEERTOS_USE_OWN_MEM && DEBUG_MODE
+  sprintf (dbg_buf, "free_heap_after_create_led_task=%u\r\n", xPortGetFreeHeapSize());
+  dbg_putStr (dbg_buf);
+  #endif
+  
+  xTaskCreate((TaskFunction_t )opcua_thread, (const char*)"opcua_thread", 2048, (void* )NULL, (UBaseType_t)3, (TaskHandle_t*)&OPCUAtask_Handler);
+  
+  #if defined OPEN62541_FEERTOS_USE_OWN_MEM && DEBUG_MODE
+  sprintf (dbg_buf, "free_heap_after_create_opcua_task=%u\r\n", xPortGetFreeHeapSize());
+  dbg_putStr (dbg_buf);
   #endif
   /* USER CODE END 2 */
 
   /* Start scheduler */
-  osKernelStart();
+   vTaskStartScheduler();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -177,15 +194,18 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void led_task(void *pvParameters)
 {
+  //MX_LWIP_Init();
   leds_init ();
   control_LED (handle_led, ON);
+ // xTaskCreate((TaskFunction_t )tcp_task, (const char*)"tcp_task", 256, (void* )NULL, (UBaseType_t)2,	(TaskHandle_t*)&TCPtask_Handler);
+
   for(;;)
   {
     control_LED (handle_led, OFF);
     handle_led++;
     if (handle_led >= number) { handle_led = green; }
     control_LED (handle_led, ON);
-    vTaskDelay(500);
+    vTaskDelay(250);
   }
 }
 /* USER CODE END 4 */

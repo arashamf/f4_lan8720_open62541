@@ -30,7 +30,7 @@ OPT = -Og
 # Build path
 BUILD_DIR = build
 
-ROOT_DIR     = .
+ROOT_DIR     		= 	.
 CORE_PATH 			= 	$(ROOT_DIR)/Core
 CORE_PATH_SRC 		= 	$(CORE_PATH)/Src
 CORE_PATH_INC 		= 	$(CORE_PATH)/Inc
@@ -49,12 +49,14 @@ $(CORE_PATH_SRC)/stm32f4xx_it.c \
 $(CORE_PATH_SRC)/syscalls.c \
 $(CORE_PATH_SRC)/sysmem.c \
 $(CORE_PATH_SRC)/system_stm32f4xx.c \
-$(CORE_PATH_SRC)/usart.c 
+$(CORE_PATH_SRC)/usart.c \
+$(APP_PATH)/opcua.c 
 
 # C includes
-C_INCLUDES =  	$(ROOT_DIR)
-C_INCLUDES += 	$(CORE_PATH_INC)
-C_INCLUDES += 	$(APP_PATH)
+C_INCLUDES 		=  	$(ROOT_DIR)
+C_INCLUDES 		+= 	$(CORE_PATH_INC)
+C_INCLUDES 		+= 	$(APP_PATH)
+C_INCLUDES 		+= 	$(APP_PATH)
 
 # ASM sources
 ASM_SOURCES =  \
@@ -67,7 +69,7 @@ ASMM_SOURCES =
 include	filelists_lwip.mk
 include filelists_stdlib.mk
 include	fillelists_freertos.mk
-#include	fillelists_open62541.mk
+include	fillelists_open62541.mk
 
 INC_DIR  = $(patsubst %, -I%, $(C_INCLUDES))
 
@@ -114,7 +116,9 @@ AS_DEFS =
 C_DEFS =  \
 -D USE_FULL_LL_DRIVER \
 -D USE_HAL_DRIVER \
--D STM32F407xx
+-D STM32F407xx \
+-D UA_ARCHITECTURE_FREERTOSLWIP \
+-D OPEN62541_FEERTOS_USE_OWN_MEM 
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
@@ -125,10 +129,10 @@ endif
 AS_INCLUDES =  
 
 # compile gcc flags
-ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections -nostdlib
 
 #CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
-CFLAGS += $(MCU) $(C_DEFS) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS += $(MCU) $(C_DEFS) $(OPT) -Wall -fdata-sections -ffunction-sections -nostdlib 
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"

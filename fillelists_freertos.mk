@@ -18,19 +18,18 @@ CORE_RTOS_SRC  = 	$(FREERTOS_DIR)/freertos.c \
 					$(FREERTOS_SRC_DIR)/queue.c	\
 					$(FREERTOS_SRC_DIR)/stream_buffer.c \
 					$(FREERTOS_SRC_DIR)/tasks.c \
-					$(FREERTOS_SRC_DIR)/timers.c	\
-					$(FREERTOS_MemMang_DIR)/heap_4.c	\
-					 \	
+					$(FREERTOS_SRC_DIR)/timers.c 	
 					
 C_SOURCES  += $(CORE_RTOS_SRC)
 C_SOURCES  += $(FREERTOS_SRC_DIR)/portable/GCC/ARM_CM4F/port.c
 C_SOURCES  += $(FREERTOS_PORT_DIR)/cmsis_os.c
-
+C_SOURCES  += $(FREERTOS_MemMang_DIR)/heap_4.c	
+					
 
 # include directories
-INC	+= $(FREERTOS_DIR)
-INC += $(FREERTOS_INC_DIR)
-INC += $(FREERTOS_ARM_CM4_INC_DIR)
-INC += $(FREERTOS_PORT_DIR)
+INC		+= 	$(FREERTOS_DIR)
+INC 	+= 	$(FREERTOS_INC_DIR)
+INC 	+= 	$(FREERTOS_ARM_CM4_INC_DIR)
+INC 	+= 	$(FREERTOS_PORT_DIR)
 
 C_INCLUDES	+= $(INC)

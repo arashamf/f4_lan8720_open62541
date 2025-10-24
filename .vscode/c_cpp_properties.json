@@ -1,8 +1,8 @@
 {  
     "env": {
         "LWIPIncPath": [
-            "${workspaceFolder}/src/include/lwip",
-            "${workspaceFolder}/lwip/**"
+            "${workspaceFolder}/lwip/src/include/lwip",
+            "${workspaceFolder}/lwip"
         ],
         "FREERTOSIncPath": [
             "${workspaceFolder}/FreeRTOS/Source/include",
@@ -41,6 +41,8 @@
                 "_RTE_",
                 "DEBUG_MODE",
                 //"USE_CMSIS_RTOS",
+                "UA_ARCHITECTURE_FREERTOSLWIP",
+                "OPEN62541_FEERTOS_USE_OWN_MEM",
                 "USE_FULL_ASSERT"
             ]
         }

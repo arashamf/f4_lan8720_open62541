@@ -45,6 +45,13 @@
         "format": "c",
         "socket.h": "c",
         "sockets.h": "c",
-        "net.h": "c"
+        "net.h": "c",
+        "main.h": "c",
+        "random": "c",
+        "open62541.h": "c",
+        "stm32f4xx.h": "c",
+        "core_cm4.h": "c",
+        "cstring": "c",
+        "opcua.h": "c"
     }
 }

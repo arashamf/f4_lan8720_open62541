@@ -199,11 +199,12 @@ C_SOURCES +=	$(LWIPOPTDIR)/ethernetif.c
 C_SOURCES += 	$(LWIPOPTDIR)/lwip.c
 C_SOURCES += 	$(LWIPSYSDIR)/OS/sys_arch.c
 
-LWIP_INC 	= 	$(LWIPSYSDIR) \
-				$(LWIPINCDIR) \
-				$(LWIPINCDIR)/netif	\
-				$(LWIPINCDIR)/netif/ppp	\
-				$(LWIPOPTDIR)
+LWIP_INC  	+= 	$(LWIPINCDIR) 
+LWIP_INC  	+= 	$(LWIPINCDIR)/netif	
+LWIP_INC  	+= 	$(LWIPINCDIR)/netif/ppp	
+LWIP_INC  	+= 	$(LLWIPINCDIR)/lwip
+LWIP_INC  	+= 	$(LWIPOPTDIR)
+LWIP_INC  	+= 	$(LWIPSYSDIR)  
 
 C_INCLUDES 	+= 	$(LWIP_INC)
 

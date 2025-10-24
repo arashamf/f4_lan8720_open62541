@@ -1,5 +1,5 @@
-#ifndef __NET_H__
-#define __NET_H__
+#ifndef __OPCUA_H__
+#define __OPCUA_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -7,14 +7,13 @@ extern "C" {
 
 //includes -------------------------------------------------------------------
 #include "main.h"
-#include "lwip/sockets.h"
+
 
 //----------------------------------------------------------------------------
-void tcp_task(void *pvParameters);
-uint32_t tcp_thread (int  );
+void opcua_thread(void *pvParameters);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __NET_H__ */
+#endif

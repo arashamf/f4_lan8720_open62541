@@ -292,7 +292,7 @@ static void low_level_init(struct netif *netif)
   osThreadCreate (osThread(EthIf), netif);
   #else
   TaskHandle_t os_thread_def_EthIf = NULL;
-  xTaskCreate((TaskFunction_t )ethernetif_input, (const char*)"EthIf", INTERFACE_THREAD_STACK_SIZE, netif, osPriorityRealtime, (TaskHandle_t*)&os_thread_def_EthIf);
+  xTaskCreate((TaskFunction_t )ethernetif_input, (const char*)"EthIf", INTERFACE_THREAD_STACK_SIZE, netif, (UBaseType_t)3, (TaskHandle_t*)&os_thread_def_EthIf);
   #endif
   /* Enable MAC and DMA transmission and reception */
   HAL_ETH_Start(&heth);
@@ -517,14 +517,14 @@ void ethernetif_input(void const * argument)
 {
   struct pbuf *p;
   struct netif *netif = (struct netif *) argument;
-  
+   
   for( ;; )
   {
     #ifdef USE_CMSIS_RTOS
     if (osSemaphoreWait(s_xSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
     #else
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    if (xSemaphoreTakeFromISR (s_xSemaphore, &xHigherPriorityTaskWoken) == pdTRUE )
+    //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    if (xSemaphoreTake (s_xSemaphore, ( portTickType ) 100) == pdTRUE )
     #endif
     {
       do
@@ -541,6 +541,7 @@ void ethernetif_input(void const * argument)
         UNLOCK_TCPIP_CORE();
       } while(p!=NULL);
     }
+    //vTaskDelay(5);
   }
 }
 

@@ -490,3 +490,31 @@ size_t xBlocks = 0, xMaxSize = 0, xMinSize = portMAX_DELAY; /* portMAX_DELAY use
 	taskEXIT_CRITICAL();
 }
 
+//---------------------------------------------------------------------------------
+void *pvPortCalloc(size_t count, size_t size)
+{
+	void *p;
+	p = pvPortMalloc(count * size); //allocate 'count' objects of size 'size' 
+  	if (p) {
+    	memset(p, 0, count * size); // zero the memory 
+  	}
+  	return p;
+}
+
+//---------------------------------------------------------------------------------
+void *pvPortRealloc(void *mem, size_t newsize)
+{
+    if (newsize == 0) {
+        vPortFree(mem);
+        return NULL;
+    }
+    void *p;
+    p = pvPortMalloc(newsize);
+    if (p) { 
+        if (mem != NULL) {       //zero the memory 
+            memcpy(p, mem, newsize);
+            vPortFree(mem);
+        }
+    }
+    return p;
+}
