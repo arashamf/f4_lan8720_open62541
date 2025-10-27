@@ -52,6 +52,7 @@
         "stm32f4xx.h": "c",
         "core_cm4.h": "c",
         "cstring": "c",
-        "opcua.h": "c"
+        "opcua.h": "c",
+        "string.h": "c"
     }
 }

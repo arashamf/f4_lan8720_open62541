@@ -34,7 +34,7 @@
  * memory management pages of http://www.FreeRTOS.org for more information.
  */
 #include <stdlib.h>
-
+#include <string.h>
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
 task.h is included from an application file. */
@@ -504,7 +504,7 @@ void *pvPortCalloc(size_t count, size_t size)
 //---------------------------------------------------------------------------------
 void *pvPortRealloc(void *mem, size_t newsize)
 {
-    if (newsize == 0) {
+   /* if (newsize == 0) {
         vPortFree(mem);
         return NULL;
     }
@@ -516,5 +516,63 @@ void *pvPortRealloc(void *mem, size_t newsize)
             vPortFree(mem);
         }
     }
-    return p;
+    return p;*/
+
+	size_t move_size;
+	size_t block_size;
+	BlockLink_t *pxLink;
+	void *pvReturn = NULL;
+	uint8_t *puc = ( uint8_t * ) mem;
+
+	if (newsize > 0) // if NULL, exit
+	{
+		if (mem != NULL)
+		{
+			puc -= xHeapStructSize; // The memory being freed will have an BlockLink_t structure immediately before it.
+			pxLink = (void *)puc; 			// This casting is to keep the compiler from issuing warnings.
+
+			// Check allocate block
+			if ((pxLink->xBlockSize & xBlockAllocatedBit) != 0)
+			{
+				// The block is being returned to the heap - it is no longer allocated.
+				block_size = (pxLink->xBlockSize & ~xBlockAllocatedBit) - xHeapStructSize;
+
+				// Alloco nuovo spazio di memoria
+				pvReturn = pvPortCalloc(1, newsize);
+
+				if (pvReturn != NULL) // Check creation
+				{
+					if (block_size < newsize)
+					{
+						move_size = block_size;
+					}
+					else
+					{
+						move_size = block_size;
+					}
+
+					// Copio dati nel nuovo spazio di memoria
+					memcpy(pvReturn, mem, move_size);
+
+					// Libero vecchio blocco di memoria
+					vPortFree(mem);
+				}
+			}
+			else
+			{
+				pvReturn = pvPortCalloc(1,newsize);
+			}
+		}
+		else
+		{
+			pvReturn = pvPortCalloc(1,newsize);
+		}
+	}
+	else
+	{
+		pvReturn = NULL; // Exit without memory block
+	}
+
+	return pvReturn; 	// Exit with memory block
 }
+

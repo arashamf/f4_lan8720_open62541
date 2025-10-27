@@ -210,8 +210,8 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
+ /* } >CCMRAM */
   } >RAM
-
 
 
   /* Remove information from the standard libraries */

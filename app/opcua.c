@@ -17,8 +17,8 @@ void opcua_thread(void *pvParameters)
         IP_ADDRESS[2] = 111;
         IP_ADDRESS[3] = 197;
         //The default 64KB of memory for sending and receicing buffer caused problems to many users. With the code below, they are reduced to ~16KB
-        UA_UInt32 sendBufferSize = 1024;       //64 KB was too much for my platform
-        UA_UInt32 recvBufferSize = 1024;       //64 KB was too much for my platform
+        UA_UInt32 sendBufferSize = 4096;       //64 KB was too much for my platform
+        UA_UInt32 recvBufferSize = 4096;       //64 KB was too much for my platform
         UA_UInt16 portNumber = 4840;
 
         #if defined OPEN62541_FEERTOS_USE_OWN_MEM && DEBUG_MODE
@@ -28,7 +28,10 @@ void opcua_thread(void *pvParameters)
 
         UA_Server* mUaServer = UA_Server_new();
         if (mUaServer == NULL)
-        {dbg_putStr ("UA_server_error\r\n");}
+        {
+                sprintf (dbg_buf, "UA_server_error; free_heap=%u\r\n", xPortGetFreeHeapSize());
+                dbg_putStr (dbg_buf);
+        }
         UA_ServerConfig *uaServerConfig = UA_Server_getConfig(mUaServer);
         UA_ServerConfig_setMinimalCustomBuffer(uaServerConfig, portNumber, 0, sendBufferSize, recvBufferSize);
 
